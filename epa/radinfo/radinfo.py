@@ -39,5 +39,5 @@ class RADInfo(Envirofacts):
         return self._resolve_call('RAD_REGULATION', column, value, **kwargs)
 
     def regulatory_program(self, column=None, value=None, **kwargs):
-        return self._resolve_call('RAD_REGULATORY_PROGRAM', column,
+        return self._resolve_call('RAD_REGULATORY_PROG', column,
                                   value, **kwargs)

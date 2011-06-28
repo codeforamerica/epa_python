@@ -11,7 +11,7 @@ class RADInfo(Envirofacts):
     """
     Python wrapper for the EPA's RADInfo API.
 
-    >>> RADInfo().facility('city_name', 'Dallas')
+    >>> RADInfo().facility('city_name', 'Houston')
     """
 
     def __init__(self):
@@ -21,6 +21,11 @@ class RADInfo(Envirofacts):
                                'regulatory_program', 'facility']
 
     def facility(self, column=None, value=None, **kwargs):
+        """
+        Check information related to Radiation facilities.
+
+        >>> RADInfo().facility('state_code', 'CA')
+        """
         return self._resolve_call('RAD_FACILITY', column, value, **kwargs)
 
     def facility_type(self, column=None, value=None, **kwargs):

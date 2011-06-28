@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 
+"""
+All of the EPA's Envirofacts APIs follow the exact same structure -- a base
+URL, followed by a path that includes the table name, column name, and value.
+This module should be imported and built off of -- since it does has methods to
+handle calling the EPA in that way.
+"""
+
+from urllib import quote
+
 from api import API, urlopen
 
 
@@ -26,12 +35,16 @@ class Envirofacts(API):
             return self.lookup_methods
         return None
 
-    def _resolve_call(self, table, column=None, value=None, **kwargs):
+    def _resolve_call(self, table, column='', value='', **kwargs):
         """Internal method to resolve the API wrapper call."""
         if not column:
             return self.catalog(table)
         elif not value:
             return self.catalog(table, column)
+        # We have all the table, column, and value, and now need to
+        # ensure they're all strings and uppercase.
+        column = column.upper()
+        value = str(value).upper()
         return self.call_api(table, column, value, **kwargs)
 
     def call_api(self, table, column, value, **kwargs):
@@ -40,7 +53,8 @@ class Envirofacts(API):
             output_format = kwargs.pop('output_format')
         except KeyError:
             output_format = self.output_format
-        url_list = [self.base_url, table, column, value, 'rows']
+        url_list = [self.base_url, table, column,
+                    quote(value), 'rows']
         rows_count = self._number_of_rows(**kwargs)
         url_list.append(rows_count)
         url_string = '/'.join(url_list)

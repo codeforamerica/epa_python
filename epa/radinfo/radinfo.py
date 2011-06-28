@@ -8,7 +8,11 @@ from lookup_table import lookup_table
 
 
 class RADInfo(Envirofacts):
-    """Python wrapper for the EPA's RADInfo API."""
+    """
+    Python wrapper for the EPA's RADInfo API.
+
+    >>> RADInfo().facility('city_name', 'Dallas')
+    """
 
     def __init__(self):
         super(RADInfo, self).__init__()

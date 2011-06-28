@@ -31,19 +31,23 @@ class Envirofacts(API):
             return self.catalog(table)
         elif not value:
             return self.catalog(table, column)
-        return self.query(table, column, value, **kwargs)
+        return self.call_api(table, column, value, **kwargs)
 
-    def query(self, table, column, value, **kwargs):
+    def call_api(self, table, column, value, **kwargs):
         """Exposed method to connect and query the EPA's API."""
+        try:
+            output_format = kwargs.pop('output_format')
+        except KeyError:
+            output_format = self.output_format
         url_list = [self.base_url, table, column, value, 'rows']
         rows_count = self._number_of_rows(**kwargs)
         url_list.append(rows_count)
         url_string = '/'.join(url_list)
         xml_data = urlopen(url_string).read()
-        data = self._xml_to_dict(xml_data)
+        data = self._format_data(output_format, xml_data)
         return data
 
-    def _number_of_rows(count=100, start=0, **kwargs):
+    def _number_of_rows(self, start=0, count=100, **kwargs):
         """Internal method to format the number of rows the EPA API returns."""
         first = str(start)
         last = str(start + count)

@@ -4,7 +4,7 @@
 
 import unittest
 
-from radinfo import RADInfo
+from epa.radinfo import RADInfo
 
 
 class TestRADInfoInit(unittest.TestCase):

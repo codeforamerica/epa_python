@@ -4,7 +4,7 @@
 
 import unittest
 
-from mock import Mock, patch
+from mock import Mock
 
 from epa.envirofacts import Envirofacts
 
@@ -30,6 +30,24 @@ class TestCatalogMethod(unittest.TestCase):
     def test_catalog_method_with_arg_returns_None(self):
         data = Envirofacts().catalog('test')
         self.assertEquals(data, None)
+
+    def test_catalog_method_with_fake_lookup_table(self):
+        lookup_table = {'A': {'B': 'C'}}
+        enviro = Envirofacts()
+        enviro.lookup_table = lookup_table
+        a_data = enviro.catalog('A')
+        self.assertEquals(a_data, {'B': 'C'})
+        b_data = enviro.catalog('A', 'B')
+        self.assertEquals(b_data, 'C')
+
+    def test_catalog_method_with_fake_lookup_methods(self):
+        lookup_table = {'A': {'B': 'C'}}
+        lookup_methods = ['foo', 'bar', 'baz']
+        enviro = Envirofacts()
+        enviro.lookup_table = lookup_table
+        enviro.lookup_methods = lookup_methods
+        data = enviro.catalog()
+        self.assertEquals(data, lookup_methods)
 
 
 class TestCallApiMethod(unittest.TestCase):
@@ -59,6 +77,25 @@ class TestCallApiMethod(unittest.TestCase):
     def test_call_api_method_with_no_output_formatting(self):
         Envirofacts().call_api('test', 'foo', 'bar', output_format=None)
         self.assertFalse(api.xml2dict.called)
+
+
+class TestResolveCallMethod(unittest.TestCase):
+
+    def setUp(self):
+        envirofacts_api.urlopen = Mock()
+        api.xml2dict = Mock()
+
+    def test_resolve_call_with_one_arg_returns_None(self):
+        data = Envirofacts()._resolve_call('test')
+        self.assertEquals(data, None)
+
+    def test_resolve_call_with_two_args_returns_None(self):
+        data = Envirofacts()._resolve_call('test', 'foo')
+        self.assertEquals(data, None)
+
+    def test_resolve_call_uses_urlopen_when_passed_three_args(self):
+        Envirofacts()._resolve_call('test', 'foo', 'bar')
+        self.assertTrue(envirofacts_api.urlopen.called)
 
 
 class TestNumberOfRowsMethod(unittest.TestCase):

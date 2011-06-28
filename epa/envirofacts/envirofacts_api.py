@@ -11,6 +11,7 @@ class Envirofacts(API):
         self.base_url = 'http://iaspub.epa.gov/enviro/efservice'
         self.output_format = 'xml'
         self.lookup_table = None
+        self.lookup_methods = None
 
     def catalog(self, table='', column=''):
         """Lookup the values available for querying."""
@@ -21,8 +22,8 @@ class Envirofacts(API):
                     column = column.upper()
                     return lookup_table[table][column]
                 return lookup_table[table]
-            # Show what tables are available.
-            return lookup_table.keys()
+            # Show what methods are available.
+            return self.lookup_methods
         return None
 
     def _resolve_call(self, table, column=None, value=None, **kwargs):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 lookup_table = {
-    'facility': {
+    'RAD_FACILITY': {
         'CITY_NAME':
             ('The name of the city, town, or village where a facility is '
              'located.'),
@@ -85,7 +85,7 @@ lookup_table = {
             ('A web site description identifying the type of information '
              'provided at the URL.'),
     },
-    'facility_type': {
+    'RAD_FACILITY_TYPE': {
         'CIT_REF_CODE':
             ('The code that represents the environmental regulation with '
              'oversight of a facility. For example, the CIT_REF_CODE for a '
@@ -117,7 +117,7 @@ lookup_table = {
             ('Identification number assigned to the subpart of the '
              'environmental regulation with oversight of the facility.'),
     },
-    'geo': {
+    'RAD_GEO_LOCATION': {
         'COORDINATE_DATA_SOURCE_CODE':
             ('The code that represents the party responsible for providing '
              'the latitude and longitude coordinates.'),
@@ -182,7 +182,7 @@ lookup_table = {
             ('The code that represents the reference datum used to '
             'determine the vertical measure (i.e., the altitude).'),
     },
-    'regulation': {
+    'RAD_REGULATION': {
         'CFR_PART':
             ('The Part (name/title) of the regulation related '
              'to the facility.'),
@@ -223,7 +223,7 @@ lookup_table = {
             ('The URL associated with the web which provides risk data '
              'about the associated radioisotope.'),
     },
-    'regulatory_program': {
+    'RAD_REGULATORY_PROG': {
         'CIT_REF_CODE':
             ('The code that represents the environmental regulation with '
              'oversight of a facility. For example, the CIT_REF_CODE for '

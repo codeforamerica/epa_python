@@ -28,17 +28,17 @@ class TestCatalogMethod(unittest.TestCase):
         self.assertRaises(KeyError, RADInfo().catalog, 'should_be_error')
 
     def test_catalog_method_with_table_arg_returns_dict(self):
-        data = RADInfo().catalog('regulation')
+        data = RADInfo().catalog('RAD_REGULATION')
         self.assertTrue(isinstance(data, dict))
 
     def test_catalog_method_with_both_args_returns_string(self):
-        data = RADInfo().catalog('regulation', 'SECTION_ID')
+        data = RADInfo().catalog('RAD_REGULATION', 'SECTION_ID')
         expected = ('The section number of the specific Code of Federal '
                     'regulation (e.g. Part 60.489).')
         self.assertEquals(data, expected)
 
     def test_catalog_method_resolves_lowercase_column_names(self):
-        data = RADInfo().catalog('regulation', 'section_id')
+        data = RADInfo().catalog('RAD_REGULATION', 'section_id')
         expected = ('The section number of the specific Code of Federal '
                     'regulation (e.g. Part 60.489).')
         self.assertEquals(data, expected)

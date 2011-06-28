@@ -20,7 +20,7 @@ APIs
 
 >>> # Find information on a facility in a certain city.
 ... r.facility('city_name', 'Berkeley')
-{'data': {'about': 'Berkeley's Radiation Facility'}}
+{'data': {'about': "Berkeley's Radiation Facility"}}
 
 >>> # Find all the radiation facilities in Texas.
 ... r.facility('state_code', 'TX')

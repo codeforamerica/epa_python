@@ -1,4 +1,9 @@
 lookup_table = {
+  "GIC_ELIGIBLE_COST": {
+    "AMOUNT": "AMOUNT is the eligible cost (in whole dollars) for a CATEGORY_TYPE.",
+    "CATEGORY_TYPE": "CATEGORY_TYPE is the abbreviated text for each eligible cost category.",
+    "GRANT_NUMBER": "GRANT_NUMBER is the Assistance Identification Number that identifies each pre-application, pre-proposal, unsolicited proposal, application, Wastewater Treatment Construction and State Rev olving Fund prospective project, awarded grant, loan, and cooperative, Interagency and Intergovernmental agreement. Am endments to grants are also identified by a unique GRANT_NUMBER.",
+      }
   "GIC_CONSTRUCTION": {
     "MULT_FACILITY_IND": "MULTIPLE_FACILITY_IND is a code that identifies when the scope of work  of either a proposed or awarded Wastewater Treatment (WWT) Construction project or State Revolving Fund project w ill address the needs represented by more than one authority/facility number from the Needs Survey. This code is used in  conjunction with FACILITY_NUMBER to indicate a situation where the needs of more than one WWT or conveyance system, e ach with an individual authority/facility number, are addressed by the project.", 
     "SMALL_COMMUN_CODE": "SMALL_COMMUN_CODE is the code which indicates whether a Wastewater Tre atment Construction project may be funded from the set-aside for alternative systems for small communities for states with a rural population of 25% or more.", 

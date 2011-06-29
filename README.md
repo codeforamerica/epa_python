@@ -51,6 +51,9 @@ APIs
 >>> data['RAD_REGULATORY_PROGList']['Count']
 8
 
+>>> # Find geographic information.
+... r.geo('geometric_type_code', '001')
+
 ```
 
 ### GICS

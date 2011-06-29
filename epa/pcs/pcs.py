@@ -51,6 +51,10 @@ class PCS(Envirofacts):
     def enforcement_action(self, column=None, value=None, **kwargs):
         return self._resolve_call('PCS_ENFOR_ACTION', column, value, **kwargs)
 
+    def facility(self, column=None, value=None, **kwargs):
+        """Same as permit facility method."""
+        return self._resolve_call('PCS_PERMIT_FACILITY', column, value, **kwargs)
+
     def permit_facility(self, column=None, value=None, **kwargs):
         return self._resolve_call('PCS_PERMIT_FACILITY', column, value, **kwargs)
 

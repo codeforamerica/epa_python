@@ -56,6 +56,7 @@ APIs
 
 ```
 
+
 ### GICS
 
 ```python
@@ -96,6 +97,27 @@ APIs
 
 ```
 
+
+### PCS
+
+```python
+>>> from epa.pcs import PCS
+>>> p = PCS()
+
+>>> # Search for facilities in a city.
+... p.facility('location_city', 'San Francisco')
+
+>>> # Find a facility in a particular zipcode.
+... p.facility('location_zip_code', 76108)
+
+>>> # Find a sludge facility in a specific state.
+... p.sludge('handler_state', 'NY')
+
+>>> p.pipe_schedule('discharge_num', 333)
+
+>>> p.pipe_schedule('npdes', 'GMG290024')
+
+```
 
 Copyright
 ---------

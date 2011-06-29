@@ -15,7 +15,6 @@ APIs
 
 ```python
 >>> from epa.radinfo import RADInfo
-
 >>> r = RADInfo()
 
 >>> # An empty method returns a dict of available columns.
@@ -85,6 +84,12 @@ APIs
 
 >>> # Find grants for a specific city.
 ... g.grant('projecty_city_name', 'San Francisco')
+
+>>> # Search the GICS API's grants for a specific state.
+... g.grant('project_state_code', 'TX', count=500)
+
+>>> # Find an applicant in a specific zipcode.
+... g.applicant('zip_code', 94105)
 
 ```
 

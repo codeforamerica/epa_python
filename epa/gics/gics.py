@@ -13,7 +13,12 @@ class GICS(Envirofacts):
     def __init__(self):
         super(GICS, self).__init__()
         self.lookup_table = lookup_table
-        self.lookup_methods = ['construction']
+        self.lookup_methods = [
+            'action', 'applicant', 'assistance', 'authority',
+            'construction', 'eligible_cost', 'grant', 'grant_assistance',
+            'grant_authority', 'lab_office', 'milestone', 'record_type',
+            'srf_cap', 'status'
+        ]
 
     def action(self, column=None, value=None, **kwargs):
         """

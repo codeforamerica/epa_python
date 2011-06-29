@@ -51,6 +51,41 @@ APIs
 >>> data = r.regulatory_program('cit_ref_code', '40CFR300', start=50)
 >>> data['RAD_REGULATORY_PROGList']['Count']
 8
+
+```
+
+### GICS
+
+```python
+>>> from epa.gics import GICS
+>>> g = GICS()
+
+>>> # List construction projects that are 91% complete.
+... g.construction('complete_percent', 91)
+
+>>> # Find all the construction projects at a specific facility.
+... data = g.construction('facility_number', 190226001)
+>>> data['GIC_CONSTRUCTIONList']['Count']
+8
+
+>>> # Search for a specific grant's milestones.
+... g.milestone('grant_number', 190709130)
+
+>>> # Find all ADMIN COMPLETE milestones.
+... g.milestone('milestone_type', 'ADMIN COMPLETE')
+
+>>> # Search for milestones on a specific DD-MON-YY date.
+... g.milestone('milestone_date', '16-MAR-01')
+
+>>> # Find descriptions for a status code.
+... g.status('status_code', 'AF')
+
+>>> # Find grants on a specific date.
+... g.grant('award_accept_date', '12-MAR-01')
+
+>>> # Find grants for a specific city.
+... g.grant('projecty_city_name', 'San Francisco')
+
 ```
 
 

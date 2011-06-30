@@ -13,7 +13,13 @@ class PCS(Envirofacts):
     def __init__(self):
         super(PCS, self).__init__()
         self.lookup_table = lookup_table
-        self.lookup_methods = []
+        self.lookup_methods = [
+            'admin_penalty', 'audit', 'code_description',
+            'compliance_schedule', 'compliance_violation',
+            'dmr_measurement', 'enforcement_action', 'facility',
+            'hearing', 'industrial_user', 'inspection', 'permit_event',
+            'pipe_schedule', 'single_violation', 'sludge'
+        ]
 
     def admin_penalty(self, column=None, value=None, **kwargs):
         """

@@ -117,10 +117,7 @@ lookup_table = {
     "DOC_CTRL_NUM": "DOC_CTRL_NUM is a unique identification number assigned to each submission.  The format is TTYYNNNNNNNNN, where TT = document type, YY = reporting year, and NNNNNNNNN = assigned number with a check digit.", 
     "PUBLIC_CONTACT_EMAIL": "The Email address of the PUBLIC_CONTACT_PERSON.", 
     "PARTIAL_FAC": "Indicates that the facility has chosen to report by establishment or groups of establishments.  Therefore, there may be other reports filed for this chemical by other establishments of the facility. Values:  1 = Form R 'Partial' box checked, 0 = box not checked.", 
-    "REVISION_CODE": "Facilities that filed a Form R and/or a Form
-    ACertification Statement under EPCRA section 313 may submit a request to
-    the revise the data. The REVISION_CODE is a code indicating the current
-    form is a revision of a previous form and the reason it was revised. Added in reporting year 2007, the data element can have the following values:", 
+    "REVISION_CODE": "Facilities that filed a Form R and/or a Form A Certification Statement under EPCRA section 313 may submit a request to the revise the data. The REVISION_CODE is a code indicating the current form is a revision of a previous form and the reason it was revised. Added in reporting year 2007, the data element can have the following values:", 
     "DIOXIN_DISTRIBUTION_16": "Indicates the distribution (percentage) of 2,3,7,8-Tetrachlorodibenzofuran (CAS Number: 51207-31-9) in the reported dioxin or dioxin-like compounds.", 
     "ONE_TIME_RELEASE_QTY_NA": "Indicator that shows whether 'NA' was entered in Section 8.8, Quantity Released to the Environment as Result of Remedial Actions, Catastrophic Events, or One-Time Events Not Associated with Production Process (ONE_TIME_RELEASE_QTY).   Values: 1 = 'Yes', 0 = 'No'.", 
     "CERTIF_DATE_SIGNED": "The date that the senior management official signed the certification statement.", 

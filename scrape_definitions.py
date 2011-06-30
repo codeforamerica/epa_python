@@ -4,11 +4,13 @@
 In order to configure lookup dicts for EPA tables and columns in the fastest
 way possible, it's necessary to scrape the site (you'd think the data
 definitions would be more accessible, but unfortunately, they're not).
+
+Obviously this is an incredibly hack-ish scraper.
 """
 
 import re
 import json
-from urllib2 import urlopen
+from urllib2 import urlopen, HTTPError
 
 from bs4 import BeautifulSoup as bs
 
@@ -42,7 +44,8 @@ def find_definition_urls(set_of_links):
         if link.startswith('http://'):
             table_dict = {}
             soup = bs(urlopen(link).read(), ['fast', 'lxml'])
-            unordered_list = soup.find('div', {'id': 'main'}).findAll('ul')[-1]
+            div = soup.find('div', {'id': 'main'})
+            unordered_list = div.findAll('ul')[-1]
             for li in unordered_list.findAll('li'):
                 a = li.findChild('a')
                 table_dict.update({a.string: a.attrs['href']})
@@ -51,12 +54,14 @@ def find_definition_urls(set_of_links):
             definition_dict.update({link_name: table_dict})
     return definition_dict
 
+
 def create_agency(agency):
     """Create an agency text file of definitions."""
     links = find_table_links(agency)
     definition_dict = find_definition_urls(links)
     with open(agency + '.txt', 'w') as f:
         f.write(str(definition_dict))
+
 
 def loop_through_agency(agency):
     with open(agency + '.txt') as f:
@@ -73,13 +78,13 @@ def loop_through_agency(agency):
 def grab_definition(url):
     if url.startswith('//'):
         url = 'http:' + url
-    soup = bs(urlopen(url).read(), ['fast', 'lxml'])
+    elif url.startswith('/'):
+        url = 'http://www.epa.gov' + url
     try:
-        bold = soup.findAll('b')[1]
-        value = bold.next.next.strip('\n\n')
-    except IndexError:
-        print url
-    except TypeError:
+        soup = bs(urlopen(url).read(), ['fast', 'lxml'])
+        bold = soup.findAll('b')[0]
+        value = bold.next.next.strip('\r\n ')
+    except (IndexError, TypeError, HTTPError):
         print url
     else:
         return value
@@ -88,7 +93,7 @@ def grab_definition(url):
 
 def main():
     agency = 'cerclis'
-    #create_agency(agency)
+    create_agency(agency)
     loop_through_agency(agency)
 
 if __name__ == '__main__':

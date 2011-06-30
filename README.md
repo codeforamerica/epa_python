@@ -117,6 +117,13 @@ APIs
 
 >>> p.pipe_schedule('npdes', 'GMG290024')
 
+>>> p.dmr_measurement('discharge_num', '001')
+
+>>> # Find the inspections that took place on a specific date.
+... p.inspection('insp_date', '16-MAR-01')
+
+>>> p.enforcement_action('ea_code', '09')
+
 ```
 
 Copyright

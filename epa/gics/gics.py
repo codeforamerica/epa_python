@@ -97,6 +97,8 @@ class GICS(Envirofacts):
         """
         Codes and descriptions indicating whether an award is for a new
         project or for the continuation of a currently funded one.
+
+        >>> GICS().record_type('record_type_code', 'A')
         """
         return self._resolve_call('GIC_RECORD_TYPE', column, value, **kwargs)
 
@@ -104,9 +106,15 @@ class GICS(Envirofacts):
         """
         Fiscal dollar amounts for State Revolving Fund Capitalization
         Grants.
+
+        >>> GICS().srf_cap('grant_number', '340001900')
         """
         return self._resolve_call('GIC_SRF_CAP', column, value, **kwargs)
 
     def status(self, column=None, value=None, **kwargs):
-        """Provides codes and descriptions of project milestones."""
+        """
+        Provides codes and descriptions of project milestones.
+
+        >>> GICS().status('status_code', 'AF')
+        """
         return self._resolve_call('GIC_STATUS', column, value, **kwargs)

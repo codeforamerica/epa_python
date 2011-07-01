@@ -80,3 +80,39 @@ class TestMilestoneMethod(unittest.TestCase):
         expected_url = ('http://iaspub.epa.gov/enviro/efservice/'
                         'GIC_MILESTONE/MILESTONE_DATE/16-MAR-01/rows/0:100')
         envirofacts_api.urlopen.assert_called_with(expected_url)
+
+
+class TestRecordTypeMethod(unittest.TestCase):
+
+    def setUp(self):
+        mock_urlopen()
+
+    def test_record_type_method_for_record_type_code(self):
+        GICS().record_type('record_type_code', 'A')
+        expected_url = ('http://iaspub.epa.gov/enviro/efservice/'
+                        'GIC_RECORD_TYPE/RECORD_TYPE_CODE/A/rows/0:100')
+        envirofacts_api.urlopen.assert_called_with(expected_url)
+
+
+class TestSrfCapMethod(unittest.TestCase):
+
+    def setUp(self):
+        mock_urlopen()
+
+    def test_srf_cap_method_for_grant_number(self):
+        GICS().srf_cap('grant_number', '340001900')
+        expected_url = ('http://iaspub.epa.gov/enviro/efservice/'
+                        'GIC_SRF_CAP/GRANT_NUMBER/340001900/rows/0:100')
+        envirofacts_api.urlopen.assert_called_with(expected_url)
+
+
+class TestStatusMethod(unittest.TestCase):
+
+    def setUp(self):
+        mock_urlopen()
+
+    def test_status_method_for_status_code(self):
+        GICS().status('status_code', 'AF')
+        expected_url = ('http://iaspub.epa.gov/enviro/efservice/'
+                        'GIC_STATUS/STATUS_CODE/AF/rows/0:100')
+        envirofacts_api.urlopen.assert_called_with(expected_url)

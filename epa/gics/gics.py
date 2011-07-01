@@ -24,6 +24,8 @@ class GICS(Envirofacts):
         """
         The underlying GICS table provides codes and descriptions
         identifying the current status or disposition of a grant project.
+
+        >>> GICS().action('action_code', 'A')
         """
         return self._resolve_call('GIC_ACTION', column, value, **kwargs)
 
@@ -56,7 +58,11 @@ class GICS(Envirofacts):
         return self._resolve_call('GIC_CONSTRUCTION', column, value, **kwargs)
 
     def eligible_cost(self, column=None, value=None, **kwargs):
-        """The assistance dollar amounts by eligible cost category."""
+        """
+        The assistance dollar amounts by eligible cost category.
+
+        >>> GICS().eligible_cost('amount', 100000)
+        """
         return self._resolve_call('GIC_ELIGIBLE_COST', column, value, **kwargs)
 
     def grant(self, column=None, value=None, **kwargs):

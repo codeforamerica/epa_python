@@ -45,7 +45,11 @@ class Envirofacts(API):
         # ensure they're all strings and uppercase.
         column = column.upper()
         value = str(value).upper()
-        return self.call_api(table, column, value, **kwargs)
+        data = self.call_api(table, column, value, **kwargs)
+        if isinstance(data, dict):
+            # Data is actually the first value.
+            data = data.values()[0]
+        return data
 
     def call_api(self, table, column, value, **kwargs):
         """Exposed method to connect and query the EPA's API."""

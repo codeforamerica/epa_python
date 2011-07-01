@@ -40,15 +40,15 @@ APIs
 ... r.regulation('cit_ref_code', '40CFR300')
 
 >>> data = r.regulatory_program('sec_cit_ref_flag', 'N')
->>> data['RAD_REGULATORY_PROGList']['Count']
+>>> data['Count']
 100
 
 >>> new_data = r.regulatory_program('sec_cit_ref_code', 'N', count=200)
->>> new_data['RAD_REGULATORY_PROGList']['Count']
+>>> new_data['Count']
 190
 
 >>> data = r.regulatory_program('cit_ref_code', '40CFR300', start=50)
->>> data['RAD_REGULATORY_PROGList']['Count']
+>>> data['Count']
 8
 
 >>> # Find geographic information.
@@ -68,7 +68,7 @@ APIs
 
 >>> # Find all the construction projects at a specific facility.
 ... data = g.construction('facility_number', 190226001)
->>> data['GIC_CONSTRUCTIONList']['Count']
+>>> data['Count']
 8
 
 >>> # Search for a specific grant's milestones.

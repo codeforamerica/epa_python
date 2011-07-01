@@ -115,7 +115,3 @@ class TestNumberOfRowsMethod(unittest.TestCase):
     def test_number_of_rows_with_nonsense_keywords(self):
         rows = Envirofacts()._number_of_rows(foo='bar')
         self.assertEquals(rows, '0:100')
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -114,7 +114,7 @@ class TestEnforcementActionMethod(unittest.TestCase):
         envirofacts_api.urlopen.assert_called_with(expected_url)
 
 
-class TestFacilityMethod(unittest.TestCase):
+class TestPCSFacilityMethod(unittest.TestCase):
 
     def setUp(self):
         mock_urlopen()
@@ -216,7 +216,3 @@ class TestSludgeMethod(unittest.TestCase):
                         'PCS_SLUDGE/COUNTY_NAME/TARRANT/'
                         'rows/0:100')
         envirofacts_api.urlopen.assert_called_with(expected_url)
-
-
-if __name__ == '__main__':
-    unittest.main()

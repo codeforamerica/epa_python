@@ -28,7 +28,7 @@ class TestRADInfoInit(unittest.TestCase):
         self.assertTrue(isinstance(r.lookup_table, dict))
 
 
-class TestCatalogMethod(unittest.TestCase):
+class TestRADInfoCatalogMethod(unittest.TestCase):
 
     def test_empty_catalog_method(self):
         data = RADInfo().catalog()
@@ -114,7 +114,3 @@ class TestRegulatoryProgramMethod(unittest.TestCase):
         expected_url = ('http://iaspub.epa.gov/enviro/efservice/'
                         'RAD_REGULATORY_PROG/SEC_CIT_REF_FLAG/N/rows/0:100')
         envirofacts_api.urlopen.assert_called_with(expected_url)
-
-
-if __name__ == '__main__':
-    unittest.main()

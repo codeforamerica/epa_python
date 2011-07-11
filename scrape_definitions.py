@@ -39,7 +39,8 @@ class Scraper(object):
         When given a url, this function will find all the available table names
         for that EPA dataset.
         """
-        doc = lh.parse(urlopen(self.model_url))
+        html = urlopen(self.model_url).read()
+        doc = lh.fromstring(html)
         href_list = [area.attrib['href'] for area in doc.cssselect('map area')]
         tables = self._inception_table_links(href_list)
         return tables
@@ -54,7 +55,8 @@ class Scraper(object):
         for link in href_list:
             if not link.startswith('http://'):
                 link = self.agency_url + link
-            doc = lh.parse(urlopen(link))
+            html = urlopen(link).read()
+            doc = lh.fromstring(html)
             area = doc.cssselect('map area')
             if area:
                 # Then this is a model containing models.
@@ -71,7 +73,8 @@ class Scraper(object):
         for link in set_of_links:
             if link.startswith('http://'):
                 table_dict = {}
-                doc = lh.parse(urlopen(link))
+                html = urlopen(link).read()
+                doc = lh.fromstring(html)
                 unordered_list = doc.cssselect('#main ul')[-1]
                 for li in unordered_list.iterchildren():
                     a = li.find('a')
@@ -113,7 +116,8 @@ class Scraper(object):
         elif url.startswith('/'):
             url = 'http://www.epa.gov' + url
         try:
-            doc = lh.parse(urlopen(url))
+            html = urlopen(url).read()
+            doc = lh.fromstring(html)
             main = doc.cssselect('#main')[0]
             text = main.text_content()
             definition = re_description.search(text).group(1).strip()

@@ -5,96 +5,128 @@ In order to configure lookup dicts for EPA tables and columns in the fastest
 way possible, it's necessary to scrape the site (you'd think the data
 definitions would be more accessible, but unfortunately, they're not).
 
-Obviously this is an incredibly hack-ish scraper.
+This is a second attempt at making an adequate scraper -- but instead of using
+the alpha version of `BeautifulSoup 4`, it uses the `lxml` module to scrape the
+EPA sites.
 """
 
 import re
 import json
 from urllib2 import urlopen, HTTPError
 
-from bs4 import BeautifulSoup as bs
+import lxml.html as lh
 
 
-def find_table_links(agency):
-    """
-    When given a url, this function will find all the available table names
-    for that EPA dataset.
-    """
-    url_list = ['http://www.epa.gov/enviro/facts/', agency, '/']
-    agency_url = ''.join(url_list)
-    url_list.append('model.html')
-    model_url  = ''.join(url_list)
-    url = urlopen(model_url)
-    # We'll use BeautifulSoup + lxml for parsing.
-    soup = bs(url.read(), ['fast', 'lxml'])
-    images = soup.find('map').findAll('area')
-    href_list = (img.attrs['href'] for img in images)
-    table_set = set()
-    for link in href_list:
-        new_soup = bs(urlopen(agency_url + link).read(), ['fast', 'lxml'])
-        new_images = new_soup.find('map').findAll('area')
-        table_set.update((img.attrs['href'] for img in new_images))
-    return table_set
+class Scraper(object):
 
+    def __init__(self, agency=None, page='model.html'):
+        if agency.startswith('http://'):
+            # Then it's a full link.
+            self.model_url = agency
+        else:
+            url_list = ['http://www.epa.gov/enviro/facts/', agency, '/']
+            self.agency_url = ''.join(url_list)
+            url_list.append(page)
+            self.model_url = ''.join(url_list)
+        self.agency = agency
 
-def find_definition_urls(set_of_links):
-    """Find the available definition URLs for the columns in a table."""
-    definition_dict = {}
-    for link in set_of_links:
-        if link.startswith('http://'):
-            table_dict = {}
-            soup = bs(urlopen(link).read(), ['fast', 'lxml'])
-            div = soup.find('div', {'id': 'main'})
-            unordered_list = div.findAll('ul')[-1]
-            for li in unordered_list.findAll('li'):
-                a = li.findChild('a')
-                table_dict.update({a.string: a.attrs['href']})
-            link_name = re.sub('.*p_table_name=(\w+)&p_topic.*', r'\1',
-                               link).upper()
-            definition_dict.update({link_name: table_dict})
-    return definition_dict
+    def find_table_links(self):
+        """
+        When given a url, this function will find all the available table names
+        for that EPA dataset.
+        """
+        html = urlopen(self.model_url).read()
+        doc = lh.fromstring(html)
+        href_list = [area.attrib['href'] for area in doc.cssselect('map area')]
+        tables = self._inception_table_links(href_list)
+        return tables
 
+    def _inception_table_links(self, href_list):
+        """
+        Sometimes the EPA likes to nest their models and tables -- model within
+        a model within a model -- so this internal method tries to clear all
+        that up.
+        """
+        tables = set()
+        for link in href_list:
+            if not link.startswith('http://'):
+                link = self.agency_url + link
+            html = urlopen(link).read()
+            doc = lh.fromstring(html)
+            area = doc.cssselect('map area')
+            if area:
+                # Then this is a model containing models.
+                tables.update((a.attrib['href'] for a in area))
+            else:
+                # The link is a table without additional models.
+                tables.update(link)
+        return tables
 
-def create_agency(agency):
-    """Create an agency text file of definitions."""
-    links = find_table_links(agency)
-    definition_dict = find_definition_urls(links)
-    with open(agency + '.txt', 'w') as f:
-        f.write(str(definition_dict))
+    def find_definition_urls(self, set_of_links):
+        """Find the available definition URLs for the columns in a table."""
+        definition_dict = {}
+        re_link_name = re.compile('.*p_table_name=(\w+)&p_topic.*')
+        for link in set_of_links:
+            if link.startswith('http://'):
+                table_dict = {}
+                doc = lh.fromstring(urlopen(link).read())
+                unordered_list = doc.cssselect('#main ul')[-1]
+                for li in unordered_list.iterchildren():
+                    a = li.find('a')
+                    table_dict.update({a.text: a.attrib['href']})
+                link_name = re_link_name.sub(r'\1', link).upper()
+                definition_dict.update({link_name: table_dict})
+        return definition_dict
 
+    def create_agency(self):
+        """Create an agency text file of definitions."""
+        agency = self.agency
+        links = self.find_table_links()
+        definition_dict = self.find_definition_urls(links)
+        with open(agency + '.txt', 'w') as f:
+            f.write(str(definition_dict))
 
-def loop_through_agency(agency):
-    with open(agency + '.txt') as f:
-        data = eval(f.read())
-    for table in data:
-        for column in data[table]:
-            value_link = data[table][column]
-            data[table][column] = grab_definition(value_link)
-    data = json.dumps(data)
-    with open(agency + '_values.json', 'w') as f:
-        f.write(str(data))
+    def loop_through_agency(self):
+        """Loop through an agency to grab the definitions for its tables."""
+        agency = self.agency
+        with open(agency + '.txt') as f:
+            data = eval(f.read())
+        for table in data:
+            for column in data[table]:
+                value_link = data[table][column]
+                data[table][column] = self.grab_definition(value_link)
+        data = json.dumps(data)
+        with open(agency + '_values.json', 'w') as f:
+            f.write(str(data))
 
-
-def grab_definition(url):
-    if url.startswith('//'):
-        url = 'http:' + url
-    elif url.startswith('/'):
-        url = 'http://www.epa.gov' + url
-    try:
-        soup = bs(urlopen(url).read(), ['fast', 'lxml'])
-        bold = soup.findAll('b')[0]
-        value = bold.next.next.strip('\r\n ')
-    except (IndexError, TypeError, HTTPError):
-        print url
-    else:
-        return value
-    return url
+    def grab_definition(self, url):
+        """
+        Grab the column definition of a table from the EPA using a combination
+        of regular expressions and lxml.
+        """
+        re_description = re.compile('Description:(.+?\\n)')
+        re_table_name = re.compile("(\w+ Table.+)")
+        if url.startswith('//'):
+            url = 'http:' + url
+        elif url.startswith('/'):
+            url = 'http://www.epa.gov' + url
+        try:
+            doc = lh.fromstring(urlopen(url).read())
+            main = doc.cssselect('#main')[0]
+            text = main.text_content()
+            definition = re_description.search(text).group(1).strip()
+        except (AttributeError, IndexError, TypeError, HTTPError):
+            print url
+        else:
+            value = re_table_name.sub('', definition)
+            return value
+        return url
 
 
 def main():
-    agency = 'cerclis'
-    create_agency(agency)
-    loop_through_agency(agency)
+    scraper = Scraper('cerclis')
+    scraper.create_agency()
+    scraper.loop_through_agency()
 
 if __name__ == '__main__':
     main()

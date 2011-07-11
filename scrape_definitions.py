@@ -18,6 +18,10 @@ import lxml.html as lh
 
 
 class Scraper(object):
+    """
+    A web scraper that grabs table and column definitions for the multiple
+    EPA APIs.
+    """
 
     def __init__(self, agency=None, page='model.html'):
         if agency.startswith('http://'):
@@ -35,8 +39,7 @@ class Scraper(object):
         When given a url, this function will find all the available table names
         for that EPA dataset.
         """
-        html = urlopen(self.model_url).read()
-        doc = lh.fromstring(html)
+        doc = lh.parse(urlopen(self.model_url))
         href_list = [area.attrib['href'] for area in doc.cssselect('map area')]
         tables = self._inception_table_links(href_list)
         return tables
@@ -51,8 +54,7 @@ class Scraper(object):
         for link in href_list:
             if not link.startswith('http://'):
                 link = self.agency_url + link
-            html = urlopen(link).read()
-            doc = lh.fromstring(html)
+            doc = lh.parse(urlopen(link))
             area = doc.cssselect('map area')
             if area:
                 # Then this is a model containing models.
@@ -69,7 +71,7 @@ class Scraper(object):
         for link in set_of_links:
             if link.startswith('http://'):
                 table_dict = {}
-                doc = lh.fromstring(urlopen(link).read())
+                doc = lh.parse(urlopen(link))
                 unordered_list = doc.cssselect('#main ul')[-1]
                 for li in unordered_list.iterchildren():
                     a = li.find('a')
@@ -111,7 +113,7 @@ class Scraper(object):
         elif url.startswith('/'):
             url = 'http://www.epa.gov' + url
         try:
-            doc = lh.fromstring(urlopen(url).read())
+            doc = lh.parse(urlopen(url))
             main = doc.cssselect('#main')[0]
             text = main.text_content()
             definition = re_description.search(text).group(1).strip()
@@ -127,6 +129,7 @@ def main():
     scraper = Scraper('cerclis')
     scraper.create_agency()
     scraper.loop_through_agency()
+
 
 if __name__ == '__main__':
     main()

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import envirofacts
+from . import envirofacts
 import gics
 import pcs
 import radinfo

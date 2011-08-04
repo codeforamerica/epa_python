@@ -7,9 +7,13 @@ This module should be imported and built off of -- since it does has methods to
 handle calling the EPA in that way.
 """
 
-from urllib import quote
+try:
+    from urllib import quote
+except ImportError:  # pragma: no cover
+    # For Python 3.
+    from urllib.parse import quote
 
-from api import API, urlopen
+from .api import API, urlopen
 
 
 class Envirofacts(API):

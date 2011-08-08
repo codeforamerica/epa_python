@@ -163,7 +163,7 @@ See LICENSE for details.
 """
 
 setup(name="epa",
-      version="1.0",
+      version="1.3",
       description=("Python wrapper for the multiple APIs available through "
                    "the EPA's website."),
       long_description=long_description,
@@ -172,7 +172,9 @@ setup(name="epa",
       author_email="zach@codeforamerica.org",
       url="https://github.com/codeforamerica/epa_python",
       license="BSD",
-      packages=["epa"],
+      packages=["epa", "epa.pcs", "epa.gics", "epa.envirofacts",
+                "epa.envirofacts.api", "epa.envirofacts.api.xml2dict",
+                "epa.radinfo", "epa.tests"],
       classifiers=['Development Status :: 5 - Production/Stable',
                    'Intended Audience :: Developers',
                    'Natural Language :: English',

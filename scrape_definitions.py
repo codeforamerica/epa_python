@@ -115,11 +115,11 @@ def node_page(node_url):
 node_page(base_url)
 
 with open("table_lookup.py", "w") as fp:
-    fp.write("table_lookup = \\")
+    fp.write("table_lookup = \\\n")
     pprint.pprint(table_lookup, stream=fp, width=120)
 with open("table_column_lookup.py", "w") as fp:
-    fp.write("table_column_lookup = \\")
+    fp.write("table_column_lookup = \\\n")
     pprint.pprint(table_column_lookup, stream=fp, width=120)
 with open("column_table_lookup.py", "w") as fp:
-    fp.write("column_table_lookup = \\")
+    fp.write("column_table_lookup = \\\n")
     pprint.pprint(column_table_lookup, stream=fp, width=120)

@@ -4,136 +4,122 @@
 In order to configure lookup dicts for EPA tables and columns in the fastest
 way possible, it's necessary to scrape the site (you'd think the data
 definitions would be more accessible, but unfortunately, they're not).
-
-This is a second attempt at making an adequate scraper -- but instead of using
-the alpha version of `BeautifulSoup 4`, it uses the `lxml` module to scrape the
-EPA sites.
 """
 
-import re
-import json
-from urllib2 import urlopen, HTTPError
+import requests
+from bs4 import BeautifulSoup
+import pprint
 
-import lxml.html as lh
+# URL of top system page. See: https://www.epa.gov/enviro/envirofacts-model
+# This is the PCS base page:
+base_url = 'https://www.epa.gov/enviro/pcs-icis-model'
 
+# table name -> description
+table_lookup = {}
 
-class Scraper(object):
-    """
-    A web scraper that grabs table and column definitions for the multiple
-    EPA APIs.
-    """
+# table_name -> { column_name -> description }
+table_column_lookup = {}
 
-    def __init__(self, agency=None, page='model.html'):
-        if agency.startswith('http://'):
-            # Then it's a full link.
-            self.model_url = agency
-        else:
-            url_list = ['http://www.epa.gov/enviro/facts/', agency, '/']
-            self.agency_url = ''.join(url_list)
-            url_list.append(page)
-            self.model_url = ''.join(url_list)
-        self.agency = agency
-
-    def find_table_links(self):
-        """
-        When given a url, this function will find all the available table names
-        for that EPA dataset.
-        """
-        html = urlopen(self.model_url).read()
-        doc = lh.fromstring(html)
-        href_list = [area.attrib['href'] for area in doc.cssselect('map area')]
-        tables = self._inception_table_links(href_list)
-        return tables
-
-    def _inception_table_links(self, href_list):
-        """
-        Sometimes the EPA likes to nest their models and tables -- model within
-        a model within a model -- so this internal method tries to clear all
-        that up.
-        """
-        tables = set()
-        for link in href_list:
-            if not link.startswith('http://'):
-                link = self.agency_url + link
-            html = urlopen(link).read()
-            doc = lh.fromstring(html)
-            area = doc.cssselect('map area')
-            if area:
-                # Then this is a model containing models.
-                tables.update((a.attrib['href'] for a in area))
-            else:
-                # The link is a table without additional models.
-                tables.update(link)
-        return tables
-
-    def find_definition_urls(self, set_of_links):
-        """Find the available definition URLs for the columns in a table."""
-        definition_dict = {}
-        re_link_name = re.compile('.*p_table_name=(\w+)&p_topic.*')
-        for link in set_of_links:
-            if link.startswith('http://'):
-                table_dict = {}
-                html = urlopen(link).read()
-                doc = lh.fromstring(html)
-                unordered_list = doc.cssselect('#main ul')[-1]
-                for li in unordered_list.iterchildren():
-                    a = li.find('a')
-                    table_dict.update({a.text: a.attrib['href']})
-                link_name = re_link_name.sub(r'\1', link).upper()
-                definition_dict.update({link_name: table_dict})
-        return definition_dict
-
-    def create_agency(self):
-        """Create an agency text file of definitions."""
-        agency = self.agency
-        links = self.find_table_links()
-        definition_dict = self.find_definition_urls(links)
-        with open(agency + '.txt', 'w') as f:
-            f.write(str(definition_dict))
-
-    def loop_through_agency(self):
-        """Loop through an agency to grab the definitions for its tables."""
-        agency = self.agency
-        with open(agency + '.txt') as f:
-            data = eval(f.read())
-        for table in data:
-            for column in data[table]:
-                value_link = data[table][column]
-                data[table][column] = self.grab_definition(value_link)
-        data = json.dumps(data)
-        with open(agency + '_values.json', 'w') as f:
-            f.write(str(data))
-
-    def grab_definition(self, url):
-        """
-        Grab the column definition of a table from the EPA using a combination
-        of regular expressions and lxml.
-        """
-        re_description = re.compile('Description:(.+?\\n)')
-        re_table_name = re.compile("(\w+ Table.+)")
-        if url.startswith('//'):
-            url = 'http:' + url
-        elif url.startswith('/'):
-            url = 'http://www.epa.gov' + url
-        try:
-            html = urlopen(url).read()
-            doc = lh.fromstring(html)
-            main = doc.cssselect('#main')[0]
-            text = main.text_content()
-            definition = re_description.search(text).group(1).strip()
-        except (AttributeError, IndexError, TypeError, HTTPError):
-            print url
-        else:
-            value = re_table_name.sub('', definition)
-            return value
-        return url
+# column_name -> [table_name]
+column_table_lookup = {}
 
 
-def main():
-    scraper = Scraper('cerclis')
-    scraper.create_agency()
-    scraper.loop_through_agency()
+def column_page(page_url, in_table_name, in_col_name):
+    print("Table/Column:", in_table_name, in_col_name)
+    response = requests.get(page_url)
+    html_content = response.content
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    prefix = "Column Name: "
+    prefix_len = len(prefix)
+    col_name = None
+    for header in soup.find_all('h1'):
+        if header is not None and header.string.strip().startswith(prefix):
+            col_name = header.string.strip()[prefix_len:]
+            break
+    if not col_name:
+        return
+    if col_name != in_col_name:
+        print("ERROR: column name does not match expected")
+
+    string_gen = soup.strings
+    for string in string_gen:
+        if "Description:" in string:
+            description = next(string_gen).strip()
+            table_column_lookup[in_table_name][col_name] = description
+            break
+
+    if col_name not in column_table_lookup.keys():
+        column_table_lookup[col_name] = [in_table_name]
+    elif in_table_name not in column_table_lookup[col_name]:
+        column_table_lookup[col_name].append(in_table_name)
 
 
-if __name__ == '__main__':
-    main()
+def table_page(page_url):
+    response = requests.get(page_url)
+    html_content = response.content
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    prefix = "Table Name: "
+    prefix_len = len(prefix)
+    table_name = None
+    for header in soup.find_all('h1'):
+        if header is not None and header.string.strip().startswith(prefix):
+            table_name = header.string.strip()[prefix_len:]
+            break
+    if not table_name:
+        return
+    if table_name in table_lookup.keys():
+        return
+    print("Table:", table_name)
+
+    string_gen = soup.strings
+    for string in string_gen:
+        if "Description:" in string:
+            description = next(string_gen).strip()
+            table_lookup[table_name] = description
+            break
+
+    if table_name not in table_column_lookup.keys():
+        table_column_lookup[table_name] = {}
+
+    for a in soup.find_all('a'):
+        col_url = a.get('href')
+        col_name = a.string
+        if not col_url.startswith("https:"):
+            col_url = "https:" + col_url
+        if col_url is not None and "column_name" in col_url:
+            column_page(col_url, table_name, col_name)
+
+
+def node_page(node_url):
+    response = requests.get(node_url)
+    html_content = response.content
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    map_tags = soup.find_all('map')
+    area_tags = soup.find_all('area')
+
+    for map in map_tags:
+        for area in area_tags:
+            if area.parent == map:
+                url = area['href']
+                if not url.startswith("https://"):
+                    url = "https://www.epa.gov" + url
+                if "node" in url:
+                    node_page(url)
+                elif "table_name" in url:
+                    table_page(url)
+
+
+node_page(base_url)
+
+with open("table_lookup.py", "w") as fp:
+    fp.write("table_lookup = \\")
+    pprint.pprint(table_lookup, stream=fp, width=120)
+with open("table_column_lookup.py", "w") as fp:
+    fp.write("table_column_lookup = \\")
+    pprint.pprint(table_column_lookup, stream=fp, width=120)
+with open("column_table_lookup.py", "w") as fp:
+    fp.write("column_table_lookup = \\")
+    pprint.pprint(column_table_lookup, stream=fp, width=120)

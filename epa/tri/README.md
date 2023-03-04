@@ -3,7 +3,7 @@ Toxics Release Inventory
 
 Python wrapper for the Toxics Release Inventory API.
 
-Documentation for the API can be found here: [http://www.epa.gov/enviro/facts/tri/model.html](http://www.epa.gov/enviro/facts/tri/model.html)
+Documentation for the API can be found here: [https://www.epa.gov/enviro/tri-model](https://www.epa.gov/enviro/tri-model)
 
 
 Copyright

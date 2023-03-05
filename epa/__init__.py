@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import envirofacts
-import gics
-import pcs
-import radinfo
+import epa.envirofacts
+import epa.frs
+import epa.pcs
+import epa.tri
 
-__all__ = [envirofacts, gics, pcs, radinfo]
+__all__ = [envirofacts, frs, pcs, tri]

@@ -27,7 +27,14 @@ class Envirofacts(API):
         self.column_table_lookup = None
 
     def catalog(self, table='', column=''):
-        """Lookup the values available for querying."""
+        """
+        Lookup the values available for querying.
+
+        catalog(<table>) - return table description (str)
+        catalog(<table, <column>) - return column description (str)
+        catalog(column=<column>) - return list of tables that contain
+                                   this column ([str])
+        """
         if table:
             if not self.table_lookup or not self.table_column_lookup:
                 return None
@@ -46,11 +53,11 @@ class Envirofacts(API):
             if column not in self.table_column_lookup[table].keys():
                 # raise ValueError(f"table {table} has no column {column}")
                 return None
-            return self.table_column_lookup[table][column]  # get column description
+            return self.table_column_lookup[table][column]
         elif table:
-            return self.table_lookup[table]  # get table description
+            return self.table_lookup[table]
         elif column:
-            return self.column_table_lookup[column]  # get list of tables that contain this column
+            return self.column_table_lookup[column]
         return None
 
     def _resolve_call(self, table_lst, column='', value='', **kwargs):

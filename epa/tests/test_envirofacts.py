@@ -7,6 +7,7 @@ import unittest
 from mock import Mock
 
 from epa.envirofacts import Envirofacts
+from epa.envirofacts.api import API
 
 # For mocking out urlopen and xml2dict
 from epa.envirofacts import envirofacts_api
@@ -48,41 +49,50 @@ class TestCatalogMethod(unittest.TestCase):
 class TestCallApiMethod(unittest.TestCase):
 
     def setUp(self):
+        API._format_data = Mock()
         envirofacts_api.urlopen = Mock()
         api.xml2dict = Mock()
 
     def test_call_api_method_with_test_path(self):
         Envirofacts().call_api('test', 'foo', 'bar')
         expected_url = ('https://data.epa.gov/efservice/'
-                        'test/foo/=/bar/rows/0:100')
+                        'test/foo/%3D/bar/rows/0:99/json')
         envirofacts_api.urlopen.assert_called_with(expected_url)
 
     def test_call_api_method_with_count_keyword(self):
         Envirofacts().call_api('test', 'foo', 'bar', count=200)
         expected_url = ('https://data.epa.gov/efservice/'
-                        'test/foo/=/bar/rows/0:200')
+                        'test/foo/%3D/bar/rows/0:199/json')
         envirofacts_api.urlopen.assert_called_with(expected_url)
 
     def test_call_api_method_with_operation_keyword(self):
         Envirofacts().call_api('test', 'foo', 'bar', operation='>')
         expected_url = ('https://data.epa.gov/efservice/'
-                        'test/foo/>/bar/rows/0:100')
+                        'test/foo/%3E/bar/rows/0:99/json')
         envirofacts_api.urlopen.assert_called_with(expected_url)
 
     def test_call_api_method_with_start_keyword(self):
         Envirofacts().call_api('test', 'foo', 'bar', start=200)
         expected_url = ('https://data.epa.gov/efservice/'
-                        'test/foo/=/bar/rows/200:300')
+                        'test/foo/%3D/bar/rows/200:299/json')
+        envirofacts_api.urlopen.assert_called_with(expected_url)
+
+    def test_call_api_method_with_start_keyword(self):
+        Envirofacts().call_api('test', 'foo', 'bar', output_format='csv')
+        expected_url = ('https://data.epa.gov/efservice/'
+                        'test/foo/%3D/bar/rows/0:99/csv')
         envirofacts_api.urlopen.assert_called_with(expected_url)
 
     def test_call_api_method_with_no_output_formatting(self):
-        Envirofacts().call_api('test', 'foo', 'bar', output_format=None)
+        with self.assertRaises(ValueError):
+            Envirofacts().call_api('test', 'foo', 'bar', output_format=None)
         self.assertFalse(api.xml2dict.called)
 
 
 class TestResolveCallMethod(unittest.TestCase):
 
     def setUp(self):
+        API._format_data = Mock()
         envirofacts_api.urlopen = Mock()
         api.xml2dict = Mock()
 
@@ -103,16 +113,16 @@ class TestNumberOfRowsMethod(unittest.TestCase):
 
     def test_empty_number_of_rows(self):
         rows = Envirofacts()._number_of_rows()
-        self.assertEqual(rows, 'rows/0:100')
+        self.assertEqual(rows, 'rows/0:99')
 
     def test_number_of_rows_with_start_keyword(self):
         rows = Envirofacts()._number_of_rows(start=900)
-        self.assertEqual(rows, 'rows/900:1000')
+        self.assertEqual(rows, 'rows/900:999')
 
     def test_number_of_rows_with_count_keyword(self):
         rows = Envirofacts()._number_of_rows(count=200)
-        self.assertEqual(rows, 'rows/0:200')
+        self.assertEqual(rows, 'rows/0:199')
 
     def test_number_of_rows_with_nonsense_keywords(self):
         rows = Envirofacts()._number_of_rows(foo='bar')
-        self.assertEqual(rows, 'rows/0:100')
+        self.assertEqual(rows, 'rows/0:99')
